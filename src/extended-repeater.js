@@ -1,33 +1,34 @@
 const CustomError = require("../extensions/custom-error");
 
 module.exports = function repeater(str, options) {
-  'use strict';
-
-  const {repeatTimes = 0, separator = '+', addition = '', additionRepeatTimes = 0, additionSeparator = '|'} = options;
-  let string = (typeof(str) === 'string' || str === null) ? str : str.toString();
-  if (str === null) {
-    string = 'null';
-  }
-  let additionStr = (typeof(addition === 'string') || addition === null) ? addition : addition.toString();
-  if (addition === null) {
-    additionStr = 'null';
-  }
-
-  let completeAddition = [];
-  for (let i = 0; i < additionRepeatTimes; i++) {
-    completeAddition.push(additionStr);
-  }
-  completeAddition = (additionRepeatTimes === 0) ? additionStr : completeAddition.join(additionSeparator);
-
-  if (repeatTimes === 0) {
-    return string + completeAddition;
+  if(typeof str != 'string') {
+    str = String(str);
   }
 
   let result = [];
+  let addResult = [];
 
-  for (let i = 0; i < repeatTimes; i++) {
-    result.push(string + completeAddition);
+  if(!options.separator) {options.separator = "+";}
+
+  if(options.hasOwnProperty("addition")) {
+    if(typeof options.addition != 'string') {
+      options.addition = String(options.addition);
+    }
+    if(!options.additionSeparator) {options.additionSeparator = "|";}
+    for(let j = 0; j < options.additionRepeatTimes - 1; j += 1) {
+      addResult.push(options.addition);
+      addResult.push(options.additionSeparator);
+    }
+    addResult.push(options.addition);
+    addResult.push(str);
+    str = addResult.reverse().join('');
   }
 
-  return result.join(separator);
+for(let i = 0; i < options.repeatTimes - 1; i += 1) {
+  result.push(str);
+  result.push(options.separator);
+}
+result.push(str);
+  
+return result.join('');
 };
