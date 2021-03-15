@@ -1,24 +1,12 @@
 const CustomError = require("../extensions/custom-error");
 
 module.exports = function countCats(matrix) {
-  'use strict';
-
-  if (!matrix || !matrix[0]) {
-    return 0;
+  let catArray = [];
+  for(let i = 0; i < matrix.length; i += 1) {
+    const res = matrix[i].filter(function(elem) {
+      return elem === "^^";
+    });
+    catArray = catArray.concat(res);
   }
-
-  const x = matrix[0].length;
-  const y = matrix.length;
-
-  let result = 0;
-
-  for (let i = 0; i < y; i++) {
-    for (let j = 0; j < x; j++) {
-      if (matrix[i][j] === '^^') {
-        result++;
-      }
-    }
-  }
-
-  return result;
+  return catArray.length;
 };
