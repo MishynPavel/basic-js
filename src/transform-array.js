@@ -1,53 +1,50 @@
 const CustomError = require("../extensions/custom-error");
 
+const rule = {
+  "--double-next": 1,
+  "--double-prev": 2,
+  "--discard-next": 3,
+  "--discard-prev": 4
+};
+
 module.exports = function transform(arr) {
-  'use strict';
-
-  if (!Array.isArray(arr)) {
-    throw new Error('Not Array!');
+  if(Array.isArray(arr) === false) {
+    throw new Error();
   }
 
-  let result = [];
+  const result = [];
 
-  for (let i = 0; i < arr.length; i++) {
-    if (arr[i] === '--discard-next') {
-      if ((i + 1) < arr.length) {
-        i++;
-        continue;
-      } else {
-        break;
+  for(let i = 0; i < arr.length; i += 1) {
+    if(rule[arr[i]]) {
+      switch(rule[arr[i]]) {
+        case 1:
+          if(i < arr.length - 1) {
+            result.push(arr[i + 1]);
+          }
+          break;
+        case 2:
+          if(i > 0) {
+            result.push(result[result.length - 1]);
+          }
+          break;
+        case 3:
+          if(i < arr.length) {
+            result.push(undefined);
+            i += 1;
+          }
+          break;
+        case 4:
+          if(i > 0) {
+            result.pop();
+          }
+          break;
       }
+    } else {
+      result.push(arr[i]);
     }
-
-    if (arr[i] === '--discard-prev') {
-      if ((i - 1) >= 0 && arr[i - 2] !== '--discard-next') {
-        result.pop();
-        continue;
-      } else {
-        continue;
-      }
-    }
-
-    if (arr[i] === '--double-next') {
-      if ((i + 1) < arr.length) {
-        result.push(arr[i + 1]);
-        continue;
-      } else {
-        break;
-      }
-    }
-
-    if (arr[i] === '--double-prev') {
-      if ((i - 1) >= 0 && arr[i - 2] !== '--discard-next') {
-        result.push(arr[i - 1]);
-        continue;
-      } else {
-        continue;
-      }
-    }
-
-    result.push(arr[i]);
   }
-
-  return result;
+  const res = result.filter(function(x) {
+    return x !== undefined;
+  });
+  return res;
 };
