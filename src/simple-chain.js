@@ -1,63 +1,48 @@
 const CustomError = require("../extensions/custom-error");
 
 const chainMaker = {
-  getLength() {
-    'use strict';
+  "link": [],
 
-    return this.chain.split('~~').length - 1;
+  getLength() {
+    const chainLength = chainMaker.link.filter(function(x) {
+      return x !== undefined;
+    });
+    return chainLength.length;
   },
   addLink(value) {
-    'use strict';
-
-    if (value === undefined) {
-      value = '';
-    }
-
-    if (!this.chain) {
-      this.chain = `( ${value} )~~`;
-    } else {
-      this.chain += `( ${value} )~~`;
-    }
-
+    chainMaker.link.push(value);
     return chainMaker;
   },
   removeLink(position) {
-    'use strict';
+    const clearChain = chainMaker.link.filter(function(x) {
+      return x !== undefined;
+    });
+    chainMaker.link = clearChain;
 
-    this.chain = this.chain.split('~~');
-
-
-    if (!Number.isInteger(position) || position < 1 || position > this.chain.length - 1) {
-      this.chain = '';
-      throw new Error('Wrong position!');
+    if(!Number.isInteger(position) ||
+      position <= 0 ||
+      position > chainMaker.link.length) {
+        chainMaker.link = [];
+        throw new Error();
     }
-
-    this.chain.splice(position - 1, 1);
-    this.chain = this.chain.join('~~');
-
+    chainMaker.link[position - 1] = undefined;
     return chainMaker;
   },
   reverseChain() {
-    'use strict';
-
-    if (!this.chain) {
-      return chainMaker;
-    }
-
-    this.chain = this.chain.split('~~');
-    this.chain.pop();
-    this.chain = this.chain.reverse().join('~~') + '~~';
-
+    chainMaker.link = chainMaker.link.reverse();
     return chainMaker;
   },
   finishChain() {
-    'use strict';
+    const clearChain = chainMaker.link.filter(function(x) {
+      return x !== undefined;
+    });
 
-    const result = this.chain.slice(0, -2);
-
-    this.chain = '';
-
-    return result;
+    let result = "";
+    clearChain.forEach(function (element) {
+      result += "( " + element + " )~~";
+    });
+    chainMaker.link = [];
+    return result.slice(0,-2);
   }
 };
 
